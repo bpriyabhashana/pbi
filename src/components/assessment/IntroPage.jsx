@@ -1,27 +1,25 @@
-import React from 'react';
-import Footer from './Footer';
-import Logo from './Logo';
-import speedometer from '../assets/speedometer.png';
+import React, { useState, useEffect } from 'react';
+import Footer from '../commons/Footer';
+import Header from '../commons/Header';
+import { getCompletionCount } from '../../utils/completionCounter';
+import speedometer from '../../assets/speedometer.png';
 
-const IntroPage = ({ onStart }) => (
-  <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+const IntroPage = ({ onStart }) => {
+  const [completionCount, setCompletionCount] = useState(0);
 
-    {/* Header with increased height */}
-    <header className="w-full bg-white border-b border-gray-200 px-4 py-4 sm:px-6 sm:py-6 flex-shrink-0">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <div className="flex items-center space-x-2 sm:space-x-3">
-          <Logo size="small" />
-          <div className="flex flex-col">
-            <span className="text-lg sm:text-xl font-semibold text-gray-900">Burnout Assessment</span>
-            <span className="text-xs text-gray-500 hidden sm:block">Occupational Burnout Inventory</span>
-          </div>
-        </div>
-        <span className="text-xs sm:text-sm text-gray-500 hidden sm:block">Professional Self-Assessment Tool</span>
-      </div>
-    </header>
+  useEffect(() => {
+    // Load completion count from localStorage on component mount
+    setCompletionCount(getCompletionCount());
+  }, []);
+
+  return (
+  <div className="min-h-screen bg-gray-50 flex flex-col">
+
+    {/* Header */}
+    <Header showLogo={true} title="Burnout Assessment" />
 
     {/* Main Content */}
-    <div className="flex-1 flex items-center justify-center p-3 sm:p-4 lg:p-6 min-h-0">
+    <div className="flex-1 flex items-center justify-center py-8 px-3 sm:p-4 lg:p-6">
       <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 w-full max-w-4xl mx-auto">
         <div className="py-4 px-6 sm:py-5 sm:px-8 lg:py-6 lg:px-10 text-center">
           
@@ -46,7 +44,7 @@ const IntroPage = ({ onStart }) => (
           </p>
 
           {/* Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 flex-shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 flex-shrink-0">
             <div className="flex flex-col items-center space-y-2 text-gray-600">
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full"></div>
               <span className="text-xs sm:text-sm lg:text-base font-medium">5 minutes</span>
@@ -61,6 +59,11 @@ const IntroPage = ({ onStart }) => (
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-violet-500 rounded-full"></div>
               <span className="text-xs sm:text-sm lg:text-base font-medium">Instant results</span>
               <span className="text-xs text-gray-500">Immediate Feedback</span>
+            </div>
+            <div className="flex flex-col items-center space-y-2 text-gray-600">
+              <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-500 rounded-full"></div>
+              <span className="text-xs sm:text-sm lg:text-base font-medium">{completionCount.toLocaleString()}+ completed</span>
+              <span className="text-xs text-gray-500">Assessments</span>
             </div>
           </div>
 
@@ -79,7 +82,8 @@ const IntroPage = ({ onStart }) => (
 
     <Footer />
 
-  </div>
-);
+    </div>
+  );
+};
 
 export default IntroPage;

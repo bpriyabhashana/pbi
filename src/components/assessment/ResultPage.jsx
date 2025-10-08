@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { getCompleteBurnoutAssessment } from '../utils/scoring';
-import Footer from './Footer';
-import Logo from './Logo';
-import { LIKERT_SCALE_OPTIONS, UI_TEXT, BURNOUT_CATEGORIES } from '../const/const';
-import speedometer from '../assets/speedometer.png';
+import { getCompleteBurnoutAssessment } from '../../utils/scoring';
+import Footer from '../commons/Footer';
+import Header from '../commons/Header';
+import { LIKERT_SCALE_OPTIONS, UI_TEXT, BURNOUT_CATEGORIES } from '../../const/const';
+import speedometer from '../../assets/speedometer.png';
 
-const ResultPage = ({ answers, questions }) => {
+const ResultPage = ({ answers, questions, demographicData }) => {
   const assessment = getCompleteBurnoutAssessment(answers, questions);
   const { exhaustion_score, disengagement_score, professional_efficacy_score, burnoutLevel } = assessment;
   
@@ -59,18 +59,7 @@ const ResultPage = ({ answers, questions }) => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
-      <header className="w-full bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <Logo size="default" />
-            <div className="flex flex-col">
-              <span className="text-xl font-semibold text-gray-900">{UI_TEXT.APP_NAME}</span>
-              <span className="text-xs text-gray-500">Occupational Burnout Inventory</span>
-            </div>
-          </div>
-          <span className="text-sm text-gray-500">{UI_TEXT.ASSESSMENT_COMPLETE}</span>
-        </div>
-      </header>
+      <Header showLogo={true} title="Assessment Results" />
 
       {/* Main Content */}
       <div className="flex-1 py-12 px-8">
@@ -199,6 +188,159 @@ const ResultPage = ({ answers, questions }) => {
             </p>
             
             <div className="space-y-4">
+              {/* Demographic Information Section - Only show if demographic data exists and has content */}
+              {demographicData && Object.keys(demographicData).length > 0 && Object.values(demographicData).some(value => value && value.trim() !== '') && (
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  {/* Demographic Header - Clickable */}
+                  <button
+                    onClick={() => toggleSection('demographic')}
+                    className="w-full px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100 flex items-center justify-between text-left transition-colors duration-200"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 rounded-full bg-blue-400"></div>
+                      <h4 className="font-medium text-gray-800 text-sm sm:text-base">Demographic Information</h4>
+                      <span className="text-xs sm:text-sm text-gray-500">
+                        (Personal Details)
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-xs sm:text-sm text-gray-500">
+                        {expandedSections['demographic'] ? 'Hide' : 'Show'} Details
+                      </span>
+                      <div className={`transform transition-transform duration-200 ${
+                        expandedSections['demographic'] ? 'rotate-180' : ''
+                      }`}>
+                        <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                  
+                  {/* Demographic Content - Collapsible */}
+                  {expandedSections['demographic'] && (
+                    <div className="px-4 sm:px-6 py-4 bg-white border-t border-gray-200">
+                      <div className="space-y-4">
+                        {/* Age Range */}
+                        {demographicData.ageRange && (
+                          <div className="pb-4 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q1.</span> What's your age range?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.ageRange}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Job Role */}
+                        {demographicData.jobRole && (
+                          <div className="pb-4 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q2.</span> What's your job role/industry?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.jobRole.charAt(0).toUpperCase() + demographicData.jobRole.slice(1).replace(/-/g, ' ')}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Years Experience */}
+                        {demographicData.yearsExperience && (
+                          <div className="pb-4 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q3.</span> How many years of work experience do you have?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.yearsExperience === 'less-than-1' ? '<1 year' :
+                                   demographicData.yearsExperience === 'more-than-20' ? '20+ years' :
+                                   demographicData.yearsExperience.replace(/-/g, ' ') + ' years'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Work Hours */}
+                        {demographicData.workHours && (
+                          <div className="pb-4 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q4.</span> How many hours per week do you typically work?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.workHours === 'part-time' ? '<30 hrs' :
+                                   demographicData.workHours === 'more-than-70' ? '70+ hrs' :
+                                   demographicData.workHours + ' hrs'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Gender */}
+                        {demographicData.gender && (
+                          <div className="pb-4 border-b border-gray-100">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q5.</span> What's your gender?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.gender.charAt(0).toUpperCase() + demographicData.gender.slice(1)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Family Status */}
+                        {demographicData.familyStatus && (
+                          <div className="pb-4 border-b border-gray-100 last:border-b-0 last:pb-0">
+                            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="text-sm font-medium text-gray-800 mb-2">
+                                  <span className="text-orange-500 font-semibold">Q6.</span> What's your family status?
+                                </p>
+                              </div>
+                              <div className="flex-shrink-0">
+                                <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                                  {demographicData.familyStatus === 'married-no-children' ? 'Married - No kids' :
+                                   demographicData.familyStatus === 'married-with-children' ? 'Married - With kids' :
+                                   demographicData.familyStatus === 'single-parent' ? 'Single parent' :
+                                   demographicData.familyStatus.charAt(0).toUpperCase() + demographicData.familyStatus.slice(1)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {Object.entries(getQuestionsByCategory()).map(([category, categoryQuestions]) => (
                 <div key={category} className="border border-gray-200 rounded-lg overflow-hidden">
                   {/* Category Header - Clickable */}
