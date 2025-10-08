@@ -7,7 +7,7 @@ import "./index.css"; // Your global styles
 
 function App() {
   return (
-    <Router>
+    <Router basename="/pbi">
       <div className="App">
         <Routes>
           {/* Main assessment routes */}

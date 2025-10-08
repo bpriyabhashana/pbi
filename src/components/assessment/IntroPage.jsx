@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Footer from '../commons/Footer';
 import Header from '../commons/Header';
-import { getCompletionCount } from '../../utils/completionCounter';
 import speedometer from '../../assets/speedometer.png';
 
 const IntroPage = ({ onStart }) => {
-  const [completionCount, setCompletionCount] = useState(0);
-
-  useEffect(() => {
-    // Load completion count from localStorage on component mount
-    setCompletionCount(getCompletionCount());
-  }, []);
 
   return (
   <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -44,7 +37,7 @@ const IntroPage = ({ onStart }) => {
           </p>
 
           {/* Features */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 flex-shrink-0">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 flex-shrink-0">
             <div className="flex flex-col items-center space-y-2 text-gray-600">
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-emerald-500 rounded-full"></div>
               <span className="text-xs sm:text-sm lg:text-base font-medium">5 minutes</span>
@@ -59,11 +52,6 @@ const IntroPage = ({ onStart }) => {
               <div className="w-3 h-3 sm:w-4 sm:h-4 bg-violet-500 rounded-full"></div>
               <span className="text-xs sm:text-sm lg:text-base font-medium">Instant results</span>
               <span className="text-xs text-gray-500">Immediate Feedback</span>
-            </div>
-            <div className="flex flex-col items-center space-y-2 text-gray-600">
-              <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-500 rounded-full"></div>
-              <span className="text-xs sm:text-sm lg:text-base font-medium">{completionCount.toLocaleString()}+ completed</span>
-              <span className="text-xs text-gray-500">Assessments</span>
             </div>
           </div>
 

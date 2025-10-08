@@ -3,31 +3,6 @@ import LikertScale from './LikertScale';
 import Footer from '../commons/Footer';
 import Logo from '../commons/Logo';
 
-// Add keyframe animations for slide-in effects
-const slideAnimationStyles = `
-  @keyframes slideInFromRight {
-    from {
-      transform: translateX(100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-  
-  @keyframes slideInFromLeft {
-    from {
-      transform: translateX(-100%);
-      opacity: 0;
-    }
-    to {
-      transform: translateX(0);
-      opacity: 1;
-    }
-  }
-`;
-
 const QuestionPage = ({ 
   question, 
   questionNumber, 
@@ -40,73 +15,82 @@ const QuestionPage = ({
   cameFromDemographic = false
 }) => {
   const [selected, setSelected] = useState(null);
-  const [animationDirection, setAnimationDirection] = useState('right');
-  const [animationPhase, setAnimationPhase] = useState('idle'); // 'idle', 'slide-out', 'slide-in'
+  const [isTransitioning, setIsTransitioning] = useState(false);
   
   // Set selection based on previously answered questions
   React.useEffect(() => {
     setSelected(answers[questionNumber] || null);
   }, [questionNumber, answers]);
 
-  // Animation effect for question changes
-  React.useEffect(() => {
-    // Start with slide-in animation for new question
-    setAnimationPhase('slide-in');
-    
-    // After animation completes, settle into idle position
-    const timer = setTimeout(() => {
-      setAnimationPhase('idle');
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [questionNumber]);
+
 
   // Auto-advance when an answer is selected
   React.useEffect(() => {
     if (selected !== null && selected !== answers[questionNumber]) {
-      // Small delay for visual feedback, then trigger slide-out and advance
-      const timer = setTimeout(() => {
-        setAnimationDirection('right'); // Going forward/next
-        setAnimationPhase('slide-out');
-        
-        // After slide-out animation, change question
-        setTimeout(() => {
-          onNext(selected);
-        }, 300); // Increased to match CSS transition duration
-      }, 300);
+      // Show transition indicator
+      setIsTransitioning(true);
       
-      return () => clearTimeout(timer);
+      // Small delay for visual feedback, then advance
+      const timer = setTimeout(() => {
+        onNext(selected);
+        setIsTransitioning(false);
+      }, 800);
+      
+      return () => {
+        clearTimeout(timer);
+        setIsTransitioning(false);
+      };
     }
   }, [selected, answers, questionNumber, onNext]);
 
   const handleNext = () => {
-    if (selected !== null) {
-      setAnimationDirection('right'); // Going forward/next
-      setAnimationPhase('slide-out');
-      
-      // After slide-out animation, change question
+    if (selected !== null && !isTransitioning) {
+      setIsTransitioning(true);
       setTimeout(() => {
         onNext(selected);
-      }, 300); // Match CSS transition duration
+        setIsTransitioning(false);
+      }, 400);
     }
   };
 
   const handleBack = () => {
-    if (onBack) {
-      setAnimationDirection('left'); // Going backward/previous
-      setAnimationPhase('slide-out');
-      
-      // After slide-out animation, go back
+    if (onBack && !isTransitioning) {
+      setIsTransitioning(true);
       setTimeout(() => {
         onBack();
-      }, 300); // Match CSS transition duration
+        setIsTransitioning(false);
+      }, 400);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Add CSS animations */}
-      <style>{slideAnimationStyles}</style>
+      {/* Simple CSS for loading indicator */}
+      <style>{`
+        .loading-spinner {
+          border: 3px solid #f3f4f6;
+          border-top: 3px solid #fb923c;
+          border-radius: 50%;
+          width: 24px;
+          height: 24px;
+          animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        .transition-overlay {
+          background: rgba(255, 255, 255, 0.9);
+          backdrop-filter: blur(2px);
+        }
+        
+        .fade-content {
+          opacity: ${isTransitioning ? '0.3' : '1'};
+          transition: opacity 0.3s ease;
+        }
+      `}</style>
       
       {/* Compact Header */}
       <header className="w-full bg-white border-b border-gray-200 px-4 py-2 sm:px-6 sm:py-3 flex-shrink-0">
@@ -154,33 +138,21 @@ const QuestionPage = ({
           </div>
 
           {/* Question Card */}
-          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-4 lg:p-5 mb-4 flex flex-col">
+          <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-3 sm:p-4 lg:p-5 mb-4 flex flex-col relative">
             
-            {/* Question Content with Slide Animation */}
-            <div className="relative overflow-hidden">
-              <div 
-                className={`transition-all duration-300 ease-out ${
-                  animationPhase === 'slide-in'
-                    ? '' // Start immediately in center, no initial transform needed
-                    : animationPhase === 'slide-out'
-                    ? animationDirection === 'right'
-                      ? 'transform -translate-x-full opacity-0'  // Current question slides out to left (going next)
-                      : 'transform translate-x-full opacity-0'   // Current question slides out to right (going back)
-                    : 'transform translate-x-0 opacity-100'      // Question is in center position
-                }`}
-                style={{
-                  transitionProperty: 'transform, opacity',
-                  transitionTimingFunction: 'cubic-bezier(0.4, 0.0, 0.2, 1)',
-                  // Handle slide-in animation with initial position
-                  ...(animationPhase === 'slide-in' ? {
-                    transform: 'translateX(0px)',
-                    opacity: 1,
-                    animation: animationDirection === 'right' 
-                      ? 'slideInFromRight 300ms ease-out' 
-                      : 'slideInFromLeft 300ms ease-out'
-                  } : {})
-                }}
-              >
+            {/* Transition Overlay */}
+            {isTransitioning && (
+              <div className="absolute inset-0 transition-overlay rounded-xl sm:rounded-2xl flex items-center justify-center z-10">
+                <div className="flex flex-col items-center space-y-3">
+                  <div className="loading-spinner"></div>
+                  <span className="text-sm text-gray-600 font-medium">Loading next question...</span>
+                </div>
+              </div>
+            )}
+            
+            {/* Question Content */}
+            <div className="fade-content">
+              <div>
                 {/* Question Header Section */}
                 <div className="text-center mb-5 sm:mb-6">
                   
@@ -212,7 +184,12 @@ const QuestionPage = ({
             <div className="flex justify-between items-center pt-4 border-t border-gray-100">
               <button
                 onClick={handleBack}
-                className="flex items-center space-x-1 sm:space-x-2 py-2 px-3 sm:px-4 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100"
+                disabled={isTransitioning}
+                className={`flex items-center space-x-1 sm:space-x-2 py-2 px-3 sm:px-4 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base ${
+                  isTransitioning 
+                    ? 'bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed' 
+                    : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100'
+                }`}
               >
                 <span>←</span>
                 <span className="hidden sm:inline">Previous</span>
@@ -221,7 +198,12 @@ const QuestionPage = ({
 
               {/* Auto-advance indicator - always centered */}
               <div className="text-xs sm:text-sm text-gray-500 text-center">
-                {selected !== null ? (
+                {isTransitioning ? (
+                  <span className="text-orange-600 font-medium flex items-center justify-center space-x-2">
+                    <div className="loading-spinner" style={{ width: '16px', height: '16px', borderWidth: '2px' }}></div>
+                    <span>Loading next question...</span>
+                  </span>
+                ) : selected !== null ? (
                   // Check if Next button is visible (user returned to previously answered question)
                   answers[questionNumber] && selected === answers[questionNumber] ? (
                     <span className="text-green-600 font-medium">
@@ -243,7 +225,12 @@ const QuestionPage = ({
               {answers[questionNumber] && selected === answers[questionNumber] ? (
                 <button
                   onClick={handleNext}
-                  className="flex items-center space-x-1 sm:space-x-2 py-2 px-4 sm:px-6 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base bg-orange-400 text-white hover:bg-orange-500"
+                  disabled={isTransitioning}
+                  className={`flex items-center space-x-1 sm:space-x-2 py-2 px-4 sm:px-6 rounded-lg font-medium transition-colors duration-200 text-sm sm:text-base ${
+                    isTransitioning 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                      : 'bg-orange-400 text-white hover:bg-orange-500'
+                  }`}
                 >
                   <span>{questionNumber === total ? 'Complete' : 'Next'}</span>
                   {questionNumber !== total && <span>→</span>}

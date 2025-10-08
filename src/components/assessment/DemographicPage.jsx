@@ -160,7 +160,7 @@ const DemographicPage = ({ onNext, onBack, initialStep = 0, initialData = {} }) 
         </h3>
         {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
       </div>
-      <div className={`grid gap-3 ${
+      <div className={`grid gap-3 p-4 ${
         centered 
           ? 'justify-center' 
           : ''
@@ -172,12 +172,24 @@ const DemographicPage = ({ onNext, onBack, initialStep = 0, initialData = {} }) 
         {options.map((option) => (
           <button
             key={option.value}
-            onClick={() => onSelect(option.value)}
-            className={`${wide ? 'p-6' : 'p-4'} rounded-xl border-2 transition-all duration-200 transform hover:scale-105 ${
+            onClick={(e) => {
+              onSelect(option.value);
+              // Force blur on touch devices to remove focus border
+              e.target.blur();
+            }}
+            onTouchEnd={(e) => {
+              // Additional blur for iOS Safari
+              setTimeout(() => e.target.blur(), 100);
+            }}
+            className={`${wide ? 'p-6' : 'p-4'} rounded-xl border-2 transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-0 ${
               selectedValue === option.value
                 ? 'border-orange-400 bg-orange-50 text-orange-700 shadow-lg'
                 : 'border-gray-200 bg-white text-gray-700 hover:border-orange-200 hover:bg-orange-25'
             }`}
+            style={{
+              WebkitTapHighlightColor: 'transparent',
+              touchAction: 'manipulation'
+            }}
           >
             <div className={`${wide ? 'text-3xl mb-3' : 'text-2xl mb-2'}`}>{option.icon}</div>
             <div className={`${wide ? 'text-base' : 'text-sm'} font-medium`}>{option.label}</div>
@@ -191,6 +203,34 @@ const DemographicPage = ({ onNext, onBack, initialStep = 0, initialData = {} }) 
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* iOS Focus Fix Styles */}
+      <style>{`
+        /* Remove iOS Safari focus outline and tap highlights */
+        button {
+          -webkit-tap-highlight-color: transparent !important;
+          -webkit-focus-ring-color: transparent !important;
+          outline: none !important;
+        }
+        
+        button:focus {
+          outline: none !important;
+          box-shadow: none !important;
+          border-color: inherit !important;
+        }
+        
+        button:active {
+          outline: none !important;
+          box-shadow: none !important;
+        }
+        
+        /* Ensure touch manipulation for better iOS experience */
+        button {
+          touch-action: manipulation;
+          user-select: none;
+          -webkit-user-select: none;
+        }
+      `}</style>
+      
       {/* Compact Header */}
       <Header compact={true} showLogo={true} title="Demographic Information" />
 
