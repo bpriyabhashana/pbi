@@ -1,5 +1,5 @@
 import React from 'react';
-import { LIKERT_SCALE_OPTIONS, BURNOUT_CATEGORIES } from '../const/const';
+import { LIKERT_SCALE_OPTIONS, BURNOUT_CATEGORIES } from '../../const/const';
 
 const options = LIKERT_SCALE_OPTIONS;
 
