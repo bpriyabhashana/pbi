@@ -59,21 +59,21 @@ const LikertScale = ({ selected, setSelected, questionCategory }) => {
     <div className="space-y-2 sm:space-y-3">
       {options.map((option, index) => (
         <button
-          key={index}
+          key={option.value}
           className={`w-full py-2 sm:py-3 px-3 sm:px-4 lg:px-6 rounded-lg sm:rounded-xl border-2 transition-all duration-200 text-left font-medium text-sm sm:text-base lg:text-lg ${
-            getOptionColors(index, selected === index + 1)
+            getOptionColors(index, selected === option.value)
           }`}
-          onClick={() => setSelected(index + 1)}
+          onClick={() => setSelected(option.value)}
         >
           <div className="flex items-center">
             <div className={`w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2 mr-3 sm:mr-4 flex-shrink-0 flex items-center justify-center ${
-              getRadioColors(index, selected === index + 1)
+              getRadioColors(index, selected === option.value)
             }`}>
-              {selected === index + 1 && (
+              {selected === option.value && (
                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></div>
               )}
             </div>
-            <span>{option}</span>
+            <span>{option.label}</span>
           </div>
         </button>
       ))}

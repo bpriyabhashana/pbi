@@ -10,10 +10,6 @@ const Header = ({ compact = false, showLogo = true, title = null }) => {
   const isLoggedIn = isAuthenticated();
   const currentUser = getCurrentUser();
 
-  const handleLogin = () => {
-    setShowLoginModal(true);
-  };
-
   const handleLoginSuccess = () => {
     // Redirect to admin page after successful login
     navigate('/admin');

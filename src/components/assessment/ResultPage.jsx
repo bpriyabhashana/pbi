@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getCompleteBurnoutAssessment } from '../../utils/scoring';
+import { createGoogleSheetsPayload, validateAssessmentCompletion } from '../../utils/googleSheetsData';
+import { sendToGoogleAppsScript, validateAppsScriptConfig } from '../../services/googleAppsScript';
 import Footer from '../commons/Footer';
 import Header from '../commons/Header';
 import { LIKERT_SCALE_OPTIONS, UI_TEXT, BURNOUT_CATEGORIES } from '../../const/const';
@@ -12,6 +14,64 @@ const ResultPage = ({ answers, questions, demographicData }) => {
   // State for collapsible sections
   const [expandedSections, setExpandedSections] = useState({});
   
+  // Ref to prevent duplicate API calls
+  const hasSubmitted = useRef(false);
+  
+  // Prepare Google Sheets data when component mounts (only once)
+  useEffect(() => {
+    const saveAssessmentData = async () => {
+      // Prevent duplicate submissions
+      if (hasSubmitted.current) {
+        console.log('🔄 Duplicate submission prevented');
+        return;
+      }
+
+      try {
+        // Mark as submitted to prevent duplicates
+        hasSubmitted.current = true;
+        
+        // Validate Apps Script configuration
+        const config = validateAppsScriptConfig();
+        console.log('🔧 Apps Script Configuration:', config);
+        
+        // Validate assessment completion
+        const validation = validateAssessmentCompletion(answers);
+        console.log('📋 Assessment Validation:', validation);
+        
+        if (validation.isComplete) {
+          // Create the Google Sheets payload
+          const googleSheetsPayload = createGoogleSheetsPayload(answers, demographicData);
+          
+          console.log('=== GOOGLE SHEETS DATA READY ===');
+          console.log('📊 Payload for Google Sheets API:', googleSheetsPayload);
+          console.log('📈 Data Structure:', {
+            demographic: googleSheetsPayload.rawData.demographicFieldsProvided,
+            answered: googleSheetsPayload.rawData.answeredQuestions,
+            total: googleSheetsPayload.rawData.totalQuestions
+          });
+          
+          // Send to Google Apps Script
+          const result = await sendToGoogleAppsScript(googleSheetsPayload);
+          console.log('✅ Apps Script Response:', result);
+          
+        } else {
+          console.warn('⚠️ Assessment incomplete:', validation);
+          // Reset flag if validation failed
+          hasSubmitted.current = false;
+        }
+      } catch (error) {
+        console.error('❌ Error saving assessment data:', error);
+        // Reset flag on error so user can retry if needed
+        hasSubmitted.current = false;
+      }
+    };
+    
+    // Only run if we have answers and haven't submitted yet
+    if (answers && Object.keys(answers).length > 0 && !hasSubmitted.current) {
+      saveAssessmentData();
+    }
+  }, [answers, demographicData]); // Include dependencies but use ref to prevent duplicates
+  
   const toggleSection = (category) => {
     setExpandedSections(prev => ({
       ...prev,
@@ -21,8 +81,8 @@ const ResultPage = ({ answers, questions, demographicData }) => {
   
   // Helper function to get Likert scale text
   const getLikertText = (value) => {
-    const options = LIKERT_SCALE_OPTIONS;
-    return options[value - 1] || "No Answer";
+    const option = LIKERT_SCALE_OPTIONS.find(opt => opt.value === value);
+    return option ? option.label : "No Answer";
   };
   
   // Helper function to get questions by category

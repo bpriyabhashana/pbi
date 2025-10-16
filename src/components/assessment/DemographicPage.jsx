@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import Footer from '../commons/Footer';
 import Header from '../commons/Header';
+import { 
+  ageRanges, 
+  genderOptions, 
+  jobRoles, 
+  yearsExperienceOptions, 
+  workHoursOptions, 
+  familyStatusOptions 
+} from '../../data/questions';
 
 const DemographicPage = ({ onNext, onBack, initialStep = 0, initialData = {} }) => {
   const [currentStep, setCurrentStep] = useState(initialStep);
@@ -14,71 +22,7 @@ const DemographicPage = ({ onNext, onBack, initialStep = 0, initialData = {} }) 
   });
 
   const [errors, setErrors] = useState({});
-  const [originalData, setOriginalData] = useState(initialData); // Track original values
-
-  // Interactive selection options
-  const ageRanges = [
-    { value: '18-24', label: '18-24', icon: '🎓' },
-    { value: '25-34', label: '25-34', icon: '🚀' },
-    { value: '35-44', label: '35-44', icon: '💼' },
-    { value: '45-54', label: '45-54', icon: '👔' },
-    { value: '55-64', label: '55-64', icon: '🎯' },
-    { value: '65+', label: '65+', icon: '🌟' }
-  ];
-
-  const genderOptions = [
-    { value: 'female', label: 'Female', icon: '👩' },
-    { value: 'male', label: 'Male', icon: '👨' }
-  ];
-
-  const jobRoles = [
-    { value: 'healthcare', label: 'Healthcare & Medical', icon: '🏥' },
-    { value: 'education', label: 'Education & Training', icon: '📚' },
-    { value: 'technology', label: 'Technology & IT', icon: '💻' },
-    { value: 'finance', label: 'Finance & Banking', icon: '💰' },
-    { value: 'management', label: 'Management & Leadership', icon: '👔' },
-    { value: 'sales-marketing', label: 'Sales & Marketing', icon: '📈' },
-    { value: 'customer-service', label: 'Customer Service', icon: '🎧' },
-    { value: 'human-resources', label: 'Human Resources', icon: '👥' },
-    { value: 'legal', label: 'Legal Services', icon: '⚖️' },
-    { value: 'consulting', label: 'Consulting', icon: '🎯' },
-    { value: 'retail', label: 'Retail & Commerce', icon: '🛍️' },
-    { value: 'manufacturing', label: 'Manufacturing', icon: '🏭' },
-    { value: 'construction', label: 'Construction & Engineering', icon: '🔧' },
-    { value: 'government', label: 'Government & Public Service', icon: '🏛️' },
-    { value: 'non-profit', label: 'Non-profit & Social Services', icon: '❤️' },
-    { value: 'media', label: 'Media & Communications', icon: '📺' },
-    { value: 'hospitality', label: 'Hospitality & Tourism', icon: '🏨' },
-    { value: 'research', label: 'Research & Development', icon: '🔬' },
-    { value: 'other', label: 'Other', icon: '💼' }
-  ];
-
-  const yearsExperienceOptions = [
-    { value: 'less-than-1', label: '<1 year', icon: '🌱' },
-    { value: '1-2', label: '1-2 years', icon: '🌿' },
-    { value: '3-5', label: '3-5 years', icon: '🌳' },
-    { value: '6-10', label: '6-10 years', icon: '🌲' },
-    { value: '11-15', label: '11-15 years', icon: '🏆' },
-    { value: '16-20', label: '16-20 years', icon: '🎖️' },
-    { value: 'more-than-20', label: '20+ years', icon: '👑' }
-  ];
-
-  const workHoursOptions = [
-    { value: 'part-time', label: '<30 hrs', icon: '⏰' },
-    { value: '30-40', label: '30-40 hrs', icon: '🕘' },
-    { value: '41-50', label: '41-50 hrs', icon: '🕙' },
-    { value: '51-60', label: '51-60 hrs', icon: '🕚' },
-    { value: '61-70', label: '61-70 hrs', icon: '🕛' },
-    { value: 'more-than-70', label: '70+ hrs', icon: '🔥' }
-  ];
-
-  const familyStatusOptions = [
-    { value: 'single', label: 'Single', icon: '🧍' },
-    { value: 'married-no-children', label: 'Married - No kids', icon: '👫' },
-    { value: 'married-with-children', label: 'Married - With kids', icon: '👨‍👩‍👧‍👦' },
-    { value: 'single-parent', label: 'Single parent', icon: '👨‍👧‍👦' },
-    { value: 'other', label: 'Other', icon: '👥' }
-  ];
+  const [originalData] = useState(initialData); // Track original values
 
   const handleSelection = (field, value) => {
     setDemographicData(prev => ({

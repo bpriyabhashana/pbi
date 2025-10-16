@@ -15,11 +15,11 @@ export const APP_INFO = {
 
 // Likert Scale Options
 export const LIKERT_SCALE_OPTIONS = [
-  "Strongly Disagree",
-  "Disagree", 
-  "Neutral",
-  "Agree",
-  "Strongly Agree"
+  { value: 1, label: "Strongly Disagree" },
+  { value: 2, label: "Disagree" },
+  { value: 3, label: "Neutral" },
+  { value: 4, label: "Agree" },
+  { value: 5, label: "Strongly Agree" }
 ];
 
 // Burnout Categories

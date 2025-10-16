@@ -61,9 +61,9 @@ const ConsentPage = ({ onSkipToDemographic, onSkipToAssessment, onDecline }) => 
               {/* Benefits */}
               <div className="mb-3">
                 <div className="text-xs text-gray-600 space-y-1">
-                  <div>✓ More personalized results</div>
-                  <div>✓ Help improve assessment</div>
                   <div>✓ Completely anonymous</div>
+                  <div>✓ Help improve assessment</div>
+                  <div>✓ No personal information will be collected</div>
                 </div>
               </div>
 
@@ -77,7 +77,7 @@ const ConsentPage = ({ onSkipToDemographic, onSkipToAssessment, onDecline }) => 
                     className="mt-0.5 w-3 h-3 text-orange-400 border-gray-300 rounded focus:ring-orange-400"
                   />
                   <span className="text-xs text-gray-700 leading-tight">
-                    I consent to sharing anonymous demographic data
+                    I consent to sharing data anonymously
                   </span>
                 </label>
               </div>
@@ -129,7 +129,7 @@ const ConsentPage = ({ onSkipToDemographic, onSkipToAssessment, onDecline }) => 
                 <div className="text-xs text-gray-600 space-y-1">
                   <div>• Proceed immediately</div>
                   <div>• Streamlined experience</div>
-                  <div>• Still accurate results</div>
+                  <div>• Help improve assessment</div>
                 </div>
               </div>
 

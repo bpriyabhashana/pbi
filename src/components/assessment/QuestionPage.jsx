@@ -34,7 +34,7 @@ const QuestionPage = ({
       const timer = setTimeout(() => {
         onNext(selected);
         setIsTransitioning(false);
-      }, 800);
+      }, 200);
       
       return () => {
         clearTimeout(timer);
@@ -49,7 +49,7 @@ const QuestionPage = ({
       setTimeout(() => {
         onNext(selected);
         setIsTransitioning(false);
-      }, 400);
+      }, 100);
     }
   };
 
@@ -59,7 +59,7 @@ const QuestionPage = ({
       setTimeout(() => {
         onBack();
         setIsTransitioning(false);
-      }, 400);
+      }, 200);
     }
   };
 
